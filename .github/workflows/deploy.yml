@@ -22,5 +22,6 @@ jobs:
             npm install
             npm run build
             npm run dev
-            
+            pm2 restart all
+            pm2 save
 

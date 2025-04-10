@@ -1,5 +1,7 @@
 name: remote ssh command
+
 on: [push]
+
 jobs:
   build:
     name: Build
@@ -12,5 +14,5 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           port: 22
-         script: whoami
-          
+          script: |
+            whoami

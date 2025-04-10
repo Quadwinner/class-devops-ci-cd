@@ -21,4 +21,36 @@ jobs:
           username: ubuntu
           key: ${{ secrets.PRIVATE_SSH_KEY }}
           port: 22
-          script: ./deploy.sh
+          script: |
+            # Create directory if it doesn't exist
+            mkdir -p /home/ubuntu/devopos1
+            
+            # Copy the deploy script
+            cat > /home/ubuntu/devopos1/deploy.sh << 'EOL'
+            #!/bin/bash
+
+            # Navigate to the project directory
+            cd /home/ubuntu/devopos1
+
+            # Pull the latest changes
+            git pull origin main
+
+            # Install dependencies
+            pnpm install
+
+            # Build the application
+            pnpm build
+
+            # Start or restart the application
+            if pm2 list | grep -q "devopos1"; then
+                pm2 restart devopos1
+            else
+                pm2 start pnpm --name "devopos1" -- start
+            fi
+            EOL
+
+            # Make the script executable
+            chmod +x /home/ubuntu/devopos1/deploy.sh
+
+            # Execute the deploy script
+            cd /home/ubuntu/devopos1 && ./deploy.sh

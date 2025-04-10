@@ -19,6 +19,6 @@ jobs:
         with:
           host: 3.143.237.153
           username: ubuntu
-          key: ${{ secrets.PRIVATE_SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: ./deploy.sh

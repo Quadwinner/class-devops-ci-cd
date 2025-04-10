@@ -57,7 +57,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold mb-6 text-yellow-200">UPDATED: Your Daily Challenge</h2>
             <p className="text-xl mb-8">
               Add 5 minutes to your workout today. Small improvements lead to big changes.
-              You&apos;ve got this! 🔥 balle bhai!
+              You&apos;ve got this! 🔥 balle bhai!!
             </p>
             <button 
               onClick={() => setShowContent(false)}

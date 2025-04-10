@@ -1,10 +1,7 @@
-const nextConfig = {
-  experimental: {
-    serverActions: true,
-    allowedDevOrigins: [
-      "https://8e81-3-141-7-76.ngrok-free.app",
-    ],
-  },
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
 };
 
 export default nextConfig;

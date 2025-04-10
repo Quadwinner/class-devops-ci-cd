@@ -15,12 +15,15 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            whoami
-            ls
-            cd devopos1
-            git pull
-            npm install
-            npm run build
-            pm2 restart all
-            pm2 save
+            # Navigate to project directory
+            cd /home/ubuntu/devopos1
+            
+            # Pull latest changes
+            git pull origin main
+            
+            # Make scripts executable
+            chmod +x build.sh start.sh run.sh
+            
+            # Run the application
+            ./run.sh
 

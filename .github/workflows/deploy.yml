@@ -7,6 +7,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1
         with:
@@ -15,15 +18,81 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            # Navigate to project directory
-            cd /home/ubuntu/devopos1
+            # Create directory structure
+            mkdir -p /home/ubuntu/devopos1
             
-            # Pull latest changes
-            git pull origin main
+            # Create build script
+            cat > /home/ubuntu/devopos1/build.sh << 'EOL'
+            #!/bin/bash
+
+            # Install dependencies
+            echo "Installing dependencies..."
+            npm install
+
+            # Build the application
+            echo "Building the application..."
+            npm run build
+
+            echo "Build completed successfully!"
+            EOL
+            
+            # Create start script
+            cat > /home/ubuntu/devopos1/start.sh << 'EOL'
+            #!/bin/bash
+
+            # Start the application using PM2
+            echo "Starting the application..."
+            if pm2 list | grep -q "devopos1"; then
+                echo "Restarting existing application..."
+                pm2 restart devopos1
+            else
+                echo "Starting new application instance..."
+                pm2 start npm --name "devopos1" -- start
+            fi
+
+            # Save PM2 process list
+            pm2 save
+
+            echo "Application started successfully!"
+            EOL
+            
+            # Create run script
+            cat > /home/ubuntu/devopos1/run.sh << 'EOL'
+            #!/bin/bash
+
+            # Run build script
+            echo "Running build script..."
+            ./build.sh
+
+            # Check if build was successful
+            if [ $? -eq 0 ]; then
+                echo "Build successful, starting application..."
+                ./start.sh
+            else
+                echo "Build failed, please check the logs"
+                exit 1
+            fi
+            EOL
             
             # Make scripts executable
-            chmod +x build.sh start.sh run.sh
+            chmod +x /home/ubuntu/devopos1/build.sh
+            chmod +x /home/ubuntu/devopos1/start.sh
+            chmod +x /home/ubuntu/devopos1/run.sh
+            
+            # Clone or update repository
+            if [ ! -d "/home/ubuntu/devopos1/.git" ]; then
+                # First time setup - clone repo
+                cd /home/ubuntu
+                rm -rf devopos1
+                git clone https://github.com/${{ github.repository }}.git devopos1
+                cd devopos1
+            else
+                # Update existing repo
+                cd /home/ubuntu/devopos1
+                git pull origin main
+            fi
             
             # Run the application
-            ./run.sh
+            cd /home/ubuntu/devopos1
+            ./build.sh && ./start.sh
 
